@@ -83,5 +83,5 @@ export async function signup(prevState: AuthState, formData: FormData): Promise<
   }
 
   // 5. Success redirect to protected area
-  redirect('/gallery')
+  redirect('components/Navbar')
 }
