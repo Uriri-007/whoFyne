@@ -1,36 +1,161 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# whoFyne
 
-## Getting Started
+A full-stack social web app for beauty competitions and photo voting. Users can vote on photos in real-time, and authorized uploaders can contribute new photos to the platform.
 
-First, run the development server:
+## 🌟 Features
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+- **Photo Voting System**: Real-time upvote/downvote functionality with optimistic UI updates
+- **User Authentication**: Secure sign-up and login with Supabase Auth
+- **Role-Based Access**: Differentiated roles for regular users and photo uploaders
+- **Responsive Design**: Modern, mobile-friendly interface with Tailwind CSS
+- **Real-Time Updates**: Instant vote count updates across the platform
+- **Dark Mode Support**: Professional dark-themed UI for better user experience
+
+## 🛠️ Tech Stack
+
+### Frontend
+- **Next.js 16.2.3** - React framework for production
+- **React 19** - Latest React with hooks support
+- **TypeScript** - Type-safe code development
+- **Tailwind CSS 4** - Utility-first CSS framework
+- **Lucide React** - Beautiful icon library
+- **clsx & tailwind-merge** - CSS utility helpers
+
+### Backend & Database
+- **Supabase** - PostgreSQL database with real-time API
+- **@supabase/supabase-js** - Supabase JavaScript client
+- **@supabase/ssr** - Server-side rendering support for Supabase
+
+### Development Tools
+- **ESLint** - Code linting and quality
+- **PostCSS** - CSS transformation
+- **TypeScript** - Static type checking
+
+## 📁 Project Structure
+
+```
+whoFyne/
+├── app/                    # Next.js App Router
+│   ├── actions/           # Server actions
+│   │   └── vote.ts        # Vote casting logic
+│   ├── auth/              # Authentication
+│   │   └── actions.ts     # Login/signup server actions
+│   ├── login/             # Authentication UI
+│   │   └── page.tsx       # Login/signup page
+│   ├── upload/            # Photo upload (uploader only)
+│   │   └── page.tsx       # Upload page
+│   ├── layout.tsx         # Root layout
+│   ├── page.tsx           # Home page
+│   └── globals.css        # Global styles
+├── components/            # Reusable React components
+│   ├── Navbar.tsx         # Navigation bar with auth info
+│   └── VoteButton.tsx     # Vote interaction component
+├── lib/                   # Utility functions
+│   └── utils.ts           # Helper utilities
+├── utils/                 # Shared utilities
+│   └── supabase/          # Supabase configuration
+│       ├── server.ts      # Server-side Supabase client
+│       ├── client.ts      # Client-side Supabase client
+│       └── proxy.ts       # Proxy utilities
+├── public/                # Static assets
+├── package.json           # Dependencies and scripts
+├── tsconfig.json          # TypeScript configuration
+├── next.config.ts         # Next.js configuration
+├── tailwind.config.ts     # Tailwind CSS configuration
+└── postcss.config.mjs     # PostCSS configuration
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## 🚀 Getting Started
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+### Prerequisites
+- Node.js 18+ 
+- npm or yarn
+- Supabase account
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+### Installation
 
-## Learn More
+1. **Clone the repository**
+   ```bash
+   git clone https://github.com/Uriri-007/whoFyne.git
+   cd whoFyne
+   ```
 
-To learn more about Next.js, take a look at the following resources:
+2. **Install dependencies**
+   ```bash
+   npm install
+   ```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+3. **Environment Setup**
+   Create a `.env.local` file in the root directory:
+   ```
+   NEXT_PUBLIC_SUPABASE_URL=your_supabase_url
+   NEXT_PUBLIC_SUPABASE_ANON_KEY=your_supabase_anon_key
+   ```
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+4. **Run the development server**
+   ```bash
+   npm run dev
+   ```
 
-## Deploy on Vercel
+   Open [http://localhost:3000](http://localhost:3000) in your browser to see the result.
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+### Available Scripts
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+- `npm run dev` - Start development server
+- `npm run build` - Build for production
+- `npm start` - Start production server
+- `npm run lint` - Run ESLint
+
+## 🔑 Key Features Explained
+
+### Voting System
+The `VoteButton` component implements optimistic UI updates for seamless voting experience:
+- Users can upvote (👍) or downvote (👎) photos
+- Vote counts update instantly with optimistic state management
+- Server-side validation ensures data consistency
+- Prevention of duplicate votes and vote switching
+
+### Authentication
+- Sign-up with email/password and username
+- Login to existing accounts
+- Session management with Supabase Auth
+- Automatic profile creation on signup
+- Role-based access control for uploaders
+
+### Photo Upload
+- Restricted to authorized uploaders only
+- Profile-based authorization checks
+- Secure file upload functionality
+
+## 🌐 Deployment
+
+The application is deployed on **Vercel** and can be accessed at: [https://who-fyne.vercel.app](https://who-fyne.vercel.app)
+
+### Deploy on Vercel
+
+1. Push your code to GitHub
+2. Import the repository on Vercel
+3. Add environment variables in Vercel dashboard
+4. Deploy with one click
+
+For detailed deployment instructions, check [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying).
+
+## 📝 Database Schema
+
+The application uses the following main tables:
+
+- **profiles** - User profile information including username and uploader status
+- **photos** - Uploaded photo metadata and details
+- **votes** - Vote records with user ID, photo ID, and vote direction
+
+## 🤝 Contributing
+
+Contributions are welcome! Feel free to submit pull requests or open issues for bugs and feature requests.
+
+## 📄 License
+
+This project is open source and available under the MIT License.
+
+---
+
+Built with ❤️ using Next.js and Supabase
