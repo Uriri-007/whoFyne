@@ -1,0 +1,24 @@
+@import "tailwindcss";
+@source "../src";
+
+@theme {
+  --font-sans: var(--font-inter);
+}
+
+@variant dark (&:where(.dark, .dark *));
+
+:root {
+  color-scheme: light;
+  --tooltip-bg: #ffffff;
+  --tooltip-color: #000000;
+}
+
+.dark {
+  color-scheme: dark;
+  --tooltip-bg: #171717;
+  --tooltip-color: #ffffff;
+}
+
+body {
+  @apply transition-colors duration-300;
+}
