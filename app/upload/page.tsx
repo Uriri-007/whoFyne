@@ -8,6 +8,8 @@ import { motion } from 'motion/react';
 import { useAuth } from '@/src/contexts/AuthContext';
 import { PageTransition } from '@/src/components/Navigation';
 
+
+
 export default function Upload() {
   const { user, profile, isWhitelisted } = useAuth();
   const router = useRouter();
@@ -103,7 +105,7 @@ export default function Upload() {
 
     try {
       setProgress(30);
-      
+
       const formData = new FormData();
       formData.append('image', file);
 
@@ -113,14 +115,46 @@ export default function Upload() {
       });
 
       if (!response.ok) {
-        const err = await response.json();
-        throw new Error(err.error || 'Optimization failed');
+        let errMessage = 'Optimization failed';
+        const contentType = response.headers.get('content-type');
+        if (contentType && contentType.includes('application/json')) {
+           const err = await response.json();
+           errMessage = err.error || errMessage;
+        } else {
+           const text = await response.text();
+           console.error("Non-JSON error from /api/optimize:", text);
+           if (response.status === 413) {
+             errMessage = 'Image is too large. Please upload a smaller image.';
+           } else {
+             errMessage = `Server error: ${response.status} ${response.statusText}`;
+           }
+        }
+        throw new Error(errMessage);
       }
 
-      const result = await response.json();
-      const optimizedBase64 = result.imageUrl;
+      const blob = await response.blob();
       
-      setProgress(70);
+      setProgress(50);
+      
+      // Upload to Supabase Storage
+      const fileExt = 'webp';
+      const fileName = `${user.id}/${Math.random().toString(36).substring(2)}_${Date.now()}.${fileExt}`;
+      
+      const { data: storageData, error: storageError } = await supabase.storage
+        .from('uploads')
+        .upload(fileName, blob, {
+          contentType: 'image/webp',
+          cacheControl: '3600',
+          upsert: false
+        });
+
+      if (storageError) throw storageError;
+
+      const { data: { publicUrl } } = supabase.storage
+        .from('uploads')
+        .getPublicUrl(fileName);
+
+      setProgress(85);
 
       const today = new Date().toISOString().split('T')[0];
       const dayKey = today;
@@ -130,7 +164,7 @@ export default function Upload() {
         uploaderId: user.id,
         uploaderName: profile.username,
         uploaderAvatar: profile.avatarUrl,
-        imageUrl: optimizedBase64,
+        imageUrl: publicUrl,
         title: title,
         upvotes: 0,
         downvotes: 0,

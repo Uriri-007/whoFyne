@@ -21,13 +21,11 @@ export async function POST(req: NextRequest) {
       .webp({ quality: 80 })
       .toBuffer();
 
-    const base64 = `data:image/webp;base64,${optimizedBuffer.toString('base64')}`;
-    
-    return NextResponse.json({ 
-      success: true, 
-      imageUrl: base64,
-      format: 'webp',
-      size: optimizedBuffer.length
+    return new NextResponse(optimizedBuffer, {
+      headers: {
+        'Content-Type': 'image/webp',
+        'Content-Length': optimizedBuffer.length.toString(),
+      },
     });
   } catch (error) {
     console.error('Optimization error:', error);

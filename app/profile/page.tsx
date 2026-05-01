@@ -56,7 +56,7 @@ export default function Profile() {
           gender,
           avatarUrl
         })
-        .eq('uid', user.id);
+        .eq('id', user.id);
 
       if (updateError) throw updateError;
 

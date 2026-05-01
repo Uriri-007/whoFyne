@@ -207,7 +207,7 @@ export default function Home() {
        const { data: uploaderDoc } = await supabase
          .from('users')
          .select('totalVotesReceived')
-         .eq('uid', upload.uploaderId)
+         .eq('id', upload.uploaderId)
          .single();
          
        if (uploaderDoc) {
@@ -217,7 +217,7 @@ export default function Home() {
             .update({
               totalVotesReceived: currentTotal + (type === 'up' ? 1 : -1)
             })
-            .eq('uid', upload.uploaderId);
+            .eq('id', upload.uploaderId);
        }
 
     } catch (error: any) {

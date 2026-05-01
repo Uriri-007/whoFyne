@@ -132,3 +132,14 @@ alter publication supabase_realtime add table public.uploads;
 grant usage on schema public to anon, authenticated;
 grant all privileges on all tables in schema public to anon, authenticated;
 grant all privileges on all sequences in schema public to anon, authenticated;
+
+-- 8. Setup Supabase Storage
+-- Note: You might need to create the bucket manually in the Supabase Dashboard
+-- name: 'uploads', public: true
+
+-- If you have permissions, you can try running this:
+-- insert into storage.buckets (id, name, public) values ('uploads', 'uploads', true);
+
+-- Storage Policies
+-- create policy "Public Access" on storage.objects for select using ( bucket_id = 'uploads' );
+-- create policy "Authenticated Upload" on storage.objects for insert with check ( bucket_id = 'uploads' AND auth.role() = 'authenticated' );

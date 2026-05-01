@@ -9,7 +9,7 @@ import { LeaderboardSkeleton, Skeleton } from '@/src/components/Skeleton';
 import { useAuth } from '@/src/contexts/AuthContext';
 
 interface LeaderboardUser {
-  uid: string;
+  id: string;
   username: string;
   avatarUrl: string;
   totalVotesReceived: number;
@@ -85,10 +85,10 @@ export default function Dashboard() {
   const chartData = leaderboard.map(u => ({
     name: u.username,
     votes: u.totalVotesReceived,
-    isMe: u.uid === profile?.uid
+    isMe: u.id === profile?.id
   }));
 
-  const userRank = profile?.isUploader ? leaderboard.findIndex(u => u.uid === profile?.uid) + 1 : 0;
+  const userRank = profile?.isUploader ? leaderboard.findIndex(u => u.id === profile?.id) + 1 : 0;
 
   return (
     <PageTransition>
@@ -122,11 +122,11 @@ export default function Dashboard() {
               </h3>
               <div className="space-y-4">
                 {leaderboard.slice(0, 5).map((user, idx) => (
-                  <div key={user.uid} className="flex items-center justify-between group">
+                  <div key={user.id} className="flex items-center justify-between group">
                     <div className="flex items-center gap-3">
                       <div className="relative">
                         <img 
-                          src={user.avatarUrl || `https://api.dicebear.com/7.x/avataaars/svg?seed=${user.uid}`} 
+                          src={user.avatarUrl || `https://api.dicebear.com/7.x/avataaars/svg?seed=${user.id}`} 
                           alt={user.username} 
                           className="w-10 h-10 rounded-full border border-neutral-100 dark:border-neutral-800 transition-colors" 
                         />
@@ -134,7 +134,7 @@ export default function Dashboard() {
                           {idx + 1}
                         </span>
                       </div>
-                      <span className={`text-sm font-medium transition-colors ${user.uid === profile?.uid ? 'text-indigo-600 dark:text-indigo-400 font-bold' : 'text-neutral-700 dark:text-neutral-300'}`}>
+                      <span className={`text-sm font-medium transition-colors ${user.id === profile?.id ? 'text-indigo-600 dark:text-indigo-400 font-bold' : 'text-neutral-700 dark:text-neutral-300'}`}>
                         {user.username}
                       </span>
                     </div>

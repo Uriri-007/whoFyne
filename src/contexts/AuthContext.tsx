@@ -3,6 +3,7 @@ import { supabase } from '../lib/supabase';
 import { User } from '@supabase/supabase-js';
 
 interface UserProfile {
+  id: string;
   uid: string;
   username: string;
   email: string;
@@ -10,6 +11,8 @@ interface UserProfile {
   gender: string;
   isUploader: boolean;
   totalVotesReceived: number;
+  themePreference: string;
+  createdAt: string;
 }
 
 interface AuthContextType {
@@ -40,7 +43,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         let { data: profileData, error: profileError } = await supabase
           .from('users')
           .select('*')
-          .eq('uid', currentUser.id)
+          .eq('id', currentUser.id)
           .single();
 
         if (profileError || !profileData) {
@@ -99,7 +102,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             await supabase
               .from('users')
               .update({ isUploader: true })
-              .eq('uid', currentUser.id);
+              .eq('id', currentUser.id);
             
             setProfile(prev => prev ? { ...prev, isUploader: true } : null);
           }
@@ -130,38 +133,52 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     };
 
     const initializeAuth = async () => {
-      const { data: { session } } = await supabase.auth.getSession();
-      const currentUser = session?.user || null;
-      setUser(currentUser);
-      
-      if (currentUser) {
-        await fetchProfileAndWhitelist(currentUser);
+      try {
+        const { data, error } = await supabase.auth.getSession();
+        
+        if (error) {
+          console.error("Session error:", error.message);
+          if (error.message.includes("Refresh Token Not Found") || error.message.includes("Invalid Refresh Token")) {
+             // Clear the broken session
+             await supabase.auth.signOut();
+          }
+        }
 
-        // Subscriptions
-        profileSubscription = supabase
-          .channel('public:users')
-          .on('postgres_changes', { event: '*', schema: 'public', table: 'users', filter: `uid=eq.${currentUser.id}` }, (payload) => {
-            if (payload.new) {
-              setProfile(payload.new as UserProfile);
-            }
-          })
-          .subscribe();
-          
-        if (currentUser.email) {
-          whitelistSubscription = supabase
-            .channel('public:whitelist')
-            .on('postgres_changes', { event: '*', schema: 'public', table: 'whitelist', filter: `email=eq.${currentUser.email}` }, (payload) => {
+        const currentUser = data?.session?.user || null;
+        setUser(currentUser);
+        
+        if (currentUser) {
+          await fetchProfileAndWhitelist(currentUser);
+
+          // Subscriptions
+          profileSubscription = supabase
+            .channel(`public:users:${currentUser.id}`)
+            .on('postgres_changes', { event: '*', schema: 'public', table: 'users', filter: `id=eq.${currentUser.id}` }, (payload) => {
               if (payload.new) {
-                setIsWhitelisted(true);
+                setProfile(payload.new as UserProfile);
               }
             })
             .subscribe();
+            
+          if (currentUser.email) {
+            whitelistSubscription = supabase
+              .channel('public:whitelist')
+              .on('postgres_changes', { event: '*', schema: 'public', table: 'whitelist', filter: `email=eq.${currentUser.email}` }, (payload) => {
+                if (payload.new) {
+                  setIsWhitelisted(true);
+                }
+              })
+              .subscribe();
+          }
+        } else {
+          setProfile(null);
+          setIsWhitelisted(false);
         }
-      } else {
-        setProfile(null);
-        setIsWhitelisted(false);
+      } catch (err: any) {
+        console.error("Auth initialization error:", err);
+      } finally {
+        setLoading(false);
       }
-      setLoading(false);
     };
 
     initializeAuth();
