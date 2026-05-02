@@ -108,12 +108,12 @@ export default async function Page({ params }: Props) {
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-start">
           {/* Main Content */}
           <div className="lg:col-span-8">
-            <div className="bg-white dark:bg-neutral-900 rounded-[40px] overflow-hidden shadow-2xl border border-neutral-100 dark:border-neutral-800 transition-colors">
-              <div className="aspect-square sm:aspect-[4/3] lg:aspect-auto overflow-hidden bg-neutral-100 dark:bg-neutral-800 relative min-h-[60vh] flex items-center justify-center transition-colors">
+            <div className="bg-white dark:bg-neutral-900 rounded-[32px] sm:rounded-[40px] overflow-hidden shadow-2xl border border-neutral-100 dark:border-neutral-800 transition-colors">
+              <div className="bg-neutral-100 dark:bg-neutral-800 relative flex items-center justify-center transition-colors">
                 <img 
                   src={upload.imageUrl || "https://picsum.photos/seed/placeholder/400/500"} 
                   alt={upload.title || "Upload"} 
-                  className="w-full h-full object-contain max-h-[80vh]"
+                  className="w-full h-auto max-h-[60vh] sm:max-h-[75vh] lg:max-h-[85vh] object-contain"
                   referrerPolicy="no-referrer"
                 />
               </div>
@@ -123,9 +123,9 @@ export default async function Page({ params }: Props) {
           {/* Details Sidebar */}
           <div className="lg:col-span-4 space-y-8">
             <div className="space-y-6">
-              <div className="flex items-center justify-between">
+              <div className="flex flex-wrap items-center justify-between gap-4">
                 <div className="flex items-center gap-3">
-                  <div className="w-12 h-12 rounded-full overflow-hidden border-2 border-neutral-100 dark:border-neutral-800 shadow-sm transition-colors bg-neutral-100 dark:bg-neutral-800">
+                  <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-full overflow-hidden border-2 border-neutral-100 dark:border-neutral-800 shadow-sm transition-colors bg-neutral-100 dark:bg-neutral-800">
                     <img 
                       src={upload.uploader?.avatarUrl || `https://api.dicebear.com/7.x/avataaars/svg?seed=${upload.uploaderId}`} 
                       alt={upload.uploader?.username || 'Uploader'}
@@ -133,52 +133,52 @@ export default async function Page({ params }: Props) {
                     />
                   </div>
                   <div>
-                    <p className="text-xs font-bold uppercase tracking-widest text-neutral-400 dark:text-neutral-500 transition-colors">Curator</p>
-                    <p className="font-bold text-neutral-900 dark:text-neutral-50 transition-colors">{upload.uploader?.username || 'Anonymous'}</p>
+                    <p className="text-[10px] font-bold uppercase tracking-widest text-neutral-400 dark:text-neutral-500 transition-colors">Curator</p>
+                    <p className="font-bold text-sm sm:text-base text-neutral-900 dark:text-neutral-50 transition-colors">{upload.uploader?.username || 'Anonymous'}</p>
                   </div>
                 </div>
-                <div className="px-4 py-2 bg-neutral-100 dark:bg-neutral-800 rounded-2xl font-mono text-xs font-bold text-neutral-500 dark:text-neutral-400 transition-colors">
+                <div className="px-3 py-1.5 sm:px-4 sm:py-2 bg-neutral-100 dark:bg-neutral-800 rounded-2xl font-mono text-[10px] sm:text-xs font-bold text-neutral-500 dark:text-neutral-400 transition-colors">
                   {new Date(upload.createdAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
                 </div>
               </div>
 
               <div className="space-y-2">
-                <h1 className="text-3xl font-bold text-neutral-900 dark:text-neutral-50 tracking-tight leading-tight transition-colors">
+                <h1 className="text-2xl sm:text-3xl font-bold text-neutral-900 dark:text-neutral-50 tracking-tight leading-tight transition-colors">
                   {upload.title || 'Untitled Masterpiece'}
                 </h1>
-                <p className="text-neutral-500 dark:text-neutral-400 leading-relaxed transition-colors">
+                <p className="text-sm sm:text-base text-neutral-50 dark:text-neutral-400 leading-relaxed transition-colors opacity-70">
                   Every capture tells a story of vibrance and community. Cast your vote to influence the leaderboard.
                 </p>
               </div>
 
-              <div className="grid grid-cols-2 gap-4">
-                <div className="bg-white dark:bg-neutral-900 p-6 rounded-3xl border border-neutral-100 dark:border-neutral-800 shadow-sm flex flex-col items-center transition-colors">
-                  <p className="text-3xl font-black text-indigo-600 dark:text-indigo-400 mb-1 transition-colors">{upload.totalVotes}</p>
-                  <p className="text-[10px] font-bold uppercase tracking-widest text-neutral-400 dark:text-neutral-500 transition-colors">Total Votes</p>
+              <div className="grid grid-cols-2 gap-3 sm:gap-4">
+                <div className="bg-white dark:bg-neutral-900 p-4 sm:p-6 rounded-3xl border border-neutral-100 dark:border-neutral-800 shadow-sm flex flex-col items-center transition-colors">
+                  <p className="text-2xl sm:text-3xl font-black text-indigo-600 dark:text-indigo-400 mb-1 transition-colors">{upload.totalVotes}</p>
+                  <p className="text-[9px] sm:text-[10px] font-bold uppercase tracking-widest text-neutral-400 dark:text-neutral-500 transition-colors">Total Votes</p>
                 </div>
-                <div className="bg-white dark:bg-neutral-900 p-6 rounded-3xl border border-neutral-100 dark:border-neutral-800 shadow-sm flex flex-col items-center transition-colors">
-                  <p className="text-3xl font-black text-neutral-900 dark:text-neutral-50 mb-1 transition-colors">{upload.upvotes}</p>
-                  <p className="text-[10px] font-bold uppercase tracking-widest text-neutral-400 dark:text-neutral-500 transition-colors">Upvotes</p>
+                <div className="bg-white dark:bg-neutral-900 p-4 sm:p-6 rounded-3xl border border-neutral-100 dark:border-neutral-800 shadow-sm flex flex-col items-center transition-colors">
+                  <p className="text-2xl sm:text-3xl font-black text-neutral-900 dark:text-neutral-50 mb-1 transition-colors">{upload.upvotes}</p>
+                  <p className="text-[9px] sm:text-[10px] font-bold uppercase tracking-widest text-neutral-400 dark:text-neutral-500 transition-colors">Upvotes</p>
                 </div>
               </div>
 
-              <div className="p-8 bg-indigo-50 dark:bg-indigo-900/10 rounded-[40px] border border-indigo-100/50 dark:border-indigo-900/30 flex flex-col items-center gap-6 text-center transition-colors">
+              <div className="p-6 sm:p-8 bg-indigo-50 dark:bg-indigo-900/10 rounded-[32px] sm:rounded-[40px] border border-indigo-100/50 dark:border-indigo-900/30 flex flex-col items-center gap-4 sm:gap-6 text-center transition-colors">
                 <div className="space-y-2">
-                  <p className="font-bold text-indigo-900 dark:text-indigo-200 transition-colors">Want to cast your vote?</p>
-                  <p className="text-sm text-indigo-700/80 dark:text-indigo-300/80 transition-colors">Votes are cast directly from our main gallery to ensure fair discovery.</p>
+                  <p className="font-bold text-sm sm:text-base text-indigo-900 dark:text-indigo-200 transition-colors">Want to cast your vote?</p>
+                  <p className="text-xs sm:text-sm text-indigo-700/80 dark:text-indigo-300/80 transition-colors">Votes are cast directly from our main gallery to ensure fair discovery.</p>
                 </div>
                 <Link 
                   href="/" 
-                  className="w-full py-4 bg-indigo-600 text-white rounded-2xl font-bold hover:bg-indigo-700 dark:hover:bg-indigo-500 transition-all shadow-lg shadow-indigo-500/20 active:scale-[0.98] flex items-center justify-center gap-2"
+                  className="w-full py-3 sm:py-4 bg-indigo-600 text-white rounded-2xl font-bold hover:bg-indigo-700 dark:hover:bg-indigo-500 transition-all shadow-lg shadow-indigo-500/20 active:scale-[0.98] flex items-center justify-center gap-2 text-sm sm:text-base"
                 >
                   Go to Gallery to Vote
                 </Link>
                 <div className="flex gap-4">
-                   <button className="p-3 bg-white dark:bg-neutral-800 rounded-xl shadow-sm border border-transparent dark:border-neutral-700 text-neutral-400 dark:text-neutral-600 cursor-not-allowed transition-colors">
-                     <ThumbsUp className="w-5 h-5" />
+                   <button className="p-2 sm:p-3 bg-white dark:bg-neutral-800 rounded-xl shadow-sm border border-transparent dark:border-neutral-700 text-neutral-400 dark:text-neutral-600 cursor-not-allowed transition-colors">
+                     <ThumbsUp className="w-4 h-4 sm:w-5 sm:h-5" />
                    </button>
-                   <button className="p-3 bg-white dark:bg-neutral-800 rounded-xl shadow-sm border border-transparent dark:border-neutral-700 text-neutral-400 dark:text-neutral-600 cursor-not-allowed transition-colors">
-                     <ThumbsDown className="w-5 h-5" />
+                   <button className="p-2 sm:p-3 bg-white dark:bg-neutral-800 rounded-xl shadow-sm border border-transparent dark:border-neutral-700 text-neutral-400 dark:text-neutral-600 cursor-not-allowed transition-colors">
+                     <ThumbsDown className="w-4 h-4 sm:w-5 sm:h-5" />
                    </button>
                 </div>
               </div>

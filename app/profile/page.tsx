@@ -20,6 +20,7 @@ export default function Profile() {
   const [avatarUrl, setAvatarUrl] = useState('');
   const [loading, setLoading] = useState(false);
   const [saved, setSaved] = useState(false);
+  const [hasInitialized, setHasInitialized] = useState(false);
 
   useEffect(() => {
     setMounted(true);
@@ -32,7 +33,7 @@ export default function Profile() {
   }, [user, authLoading, router]);
 
   useEffect(() => {
-    if (profile) {
+    if (profile && !hasInitialized) {
       setUsername(profile.username || '');
       setGender(profile.gender || 'prefer_not_to_say');
       setAvatarUrl(profile.avatarUrl || '');
@@ -40,8 +41,9 @@ export default function Profile() {
       if (mounted && profile.themePreference) {
         setTheme(profile.themePreference);
       }
+      setHasInitialized(true);
     }
-  }, [profile, mounted, setTheme]);
+  }, [profile, mounted, setTheme, hasInitialized]);
 
   if (authLoading || !user || !profile) {
     return <ProfileSkeleton />;
