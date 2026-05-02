@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
 import { Providers } from "./providers";
@@ -9,13 +9,32 @@ const inter = Inter({
   variable: "--font-sans",
 });
 
+export const viewport: Viewport = {
+  themeColor: "#4f46e5",
+  width: "device-width",
+  initialScale: 1,
+  viewportFit: "cover",
+};
+
 export const metadata: Metadata = {
-  metadataBase: new URL('https://whofyne.app'), // Replace with actual domain when deployed
+  metadataBase: new URL('https://whofyne.app'),
   title: {
     default: "WhoFyne • Curated Vibrance",
     template: "%s | WhoFyne"
   },
   description: "A premium online gallery for high-quality community-voted captures.",
+  manifest: "/manifest.json",
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: "default",
+    title: "WhoFyne",
+  },
+  formatDetection: {
+    telephone: false,
+  },
+  icons: {
+    apple: "/icon.svg",
+  },
   keywords: ["photography", "voting", "gallery", "curated", "vibrance"],
   authors: [{ name: "WhoFyne Community" }],
   openGraph: {

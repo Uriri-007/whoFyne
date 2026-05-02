@@ -133,15 +133,46 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       }
     };
 
+    const clearAuthStorage = async () => {
+      try {
+        console.warn("Auth: Clearing potentially corrupted session...");
+        await supabase.auth.signOut().catch(() => {});
+        
+        // Comprehensive cleanup of localStorage keys used by Supabase
+        const keysToRemove = [];
+        for (let i = 0; i < localStorage.length; i++) {
+          const key = localStorage.key(i);
+          if (key && (key.includes('supabase.auth.token') || key.includes('-auth-token'))) {
+            keysToRemove.push(key);
+          }
+        }
+        keysToRemove.forEach(k => localStorage.removeItem(k));
+        
+        // Also clear memory session if possible
+        setUser(null);
+        setProfile(null);
+        setIsWhitelisted(false);
+      } catch (e) {
+        console.error("Error clearing auth storage:", e);
+      }
+    };
+
     const initializeAuth = async () => {
       try {
+        setLoading(true);
         const { data, error } = await supabase.auth.getSession();
         
         if (error) {
-          console.error("Session error:", error.message);
-          if (error.message.includes("Refresh Token Not Found") || error.message.includes("Invalid Refresh Token")) {
-             // Clear the broken session
-             await supabase.auth.signOut();
+          console.error("Auth: Session error during initialization:", error.message);
+          // If we have a refresh token error, we want to clear local storage to force a clean state
+          if (
+            error.message.includes("Refresh Token") || 
+            error.message.includes("Invalid Refresh Token") ||
+            error.message.includes("token_not_found")
+          ) {
+             await clearAuthStorage();
+             setLoading(false);
+             return;
           }
         }
 
@@ -150,6 +181,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         if (currentUser) {
           setUser(currentUser);
           await fetchProfileAndWhitelist(currentUser);
+
+          // Cleanup old subscriptions
+          if (profileSubscription) supabase.removeChannel(profileSubscription);
+          if (whitelistSubscription) supabase.removeChannel(whitelistSubscription);
 
           // Subscriptions
           profileSubscription = supabase
@@ -177,7 +212,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           setIsWhitelisted(false);
         }
       } catch (err: any) {
-        console.error("Auth initialization error:", err);
+        console.error("Auth: Initialization exception:", err);
+        if (err.message?.includes("Refresh Token")) {
+          await clearAuthStorage();
+        }
         setUser(null);
         setProfile(null);
       } finally {
@@ -190,36 +228,39 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     const handleFocus = () => {
       // Re-verify session on window focus if we are possibly stale or if auth is missing
       if (!user && !loading) {
-         supabase.auth.getSession().then(({ data }) => {
-           if (data?.session?.user) {
-             initializeAuth();
-           }
-         });
+         initializeAuth();
       }
     };
 
     window.addEventListener('focus', handleFocus);
 
     const { data: { subscription: authListener } } = supabase.auth.onAuthStateChange(async (event, session) => {
-      const currentUser = session?.user || null;
-      
-      if (event === 'SIGNED_IN' && currentUser) {
-        // If we already have a user and profile, don't set loading to true again to avoid flicker/stuck states
-        if (!user || !profile) {
-          setLoading(true);
-          setUser(currentUser);
-          await fetchProfileAndWhitelist(currentUser);
+      try {
+        const currentUser = session?.user || null;
+        
+        if (event === 'SIGNED_IN' && currentUser) {
+          // If we already have a user and profile, don't set loading to true again to avoid flicker/stuck states
+          if (!user || !profile) {
+            setLoading(true);
+            setUser(currentUser);
+            await fetchProfileAndWhitelist(currentUser);
+            setLoading(false);
+          } else {
+            setUser(currentUser);
+          }
+        } else if (event === 'SIGNED_OUT') {
+          setUser(null);
+          setProfile(null);
+          setIsWhitelisted(false);
           setLoading(false);
-        } else {
+        } else if (event === 'TOKEN_REFRESHED') {
           setUser(currentUser);
         }
-      } else if (event === 'SIGNED_OUT') {
-        setUser(null);
-        setProfile(null);
-        setIsWhitelisted(false);
-        setLoading(false);
-      } else if (event === 'TOKEN_REFRESHED') {
-        setUser(currentUser);
+      } catch (err: any) {
+        console.error("Auth: onAuthStateChange error:", err);
+        if (err.message?.includes("Refresh Token")) {
+          await clearAuthStorage();
+        }
       }
     });
 
